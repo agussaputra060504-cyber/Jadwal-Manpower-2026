@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Jadwal Operator — Arjawinangun DC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F141B; --panel:#161D27; --panel-2:#1D2530;
+    --border:#2A3441; --border-strong:#3A4756;
+    --text:#E7EBF0; --text-2:#9AA7B5; --text-3:#6B7684;
+
+    --s01:#4FB3D9; --s01-bg:#123543; --s01-text:#8FD4EE;
+    --s02:#E8A33D; --s02-bg:#3A2E14; --s02-text:#F4C878;
+    --s03:#8B85E8; --s03-bg:#241F49; --s03-text:#B8B3F5;
+    --s04:#5FBF8F; --s04-bg:#123825; --s04-text:#8EDCB2;
+    --off:#5A6472; --off-bg:#1C2229; --off-text:#8B95A3;
+    --cuti:#E0605A; --cuti-bg:#3A1A18; --cuti-text:#F0938F;
+    --ro:#B7A46A; --ro-bg:#332C18; --ro-text:#D9C68F;
+    --na:#3A4149; --na-bg:#161B20; --na-text:#4E5761;
+
+    --danger:#E0605A; --ok:#5FBF8F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:28px 32px 60px;}
+  h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:0.02em;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;flex-wrap:wrap;gap:16px;border-bottom:1px solid var(--border);padding-bottom:20px;}
+  .brand-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.15em;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;}
+  .brand-title{font-size:28px;}
+  .brand-sub{font-size:12px;color:var(--text-2);margin-top:4px;}
+  .today-block{text-align:right;}
+  .today-date{font-family:'IBM Plex Mono',monospace;font-size:16px;}
+  .today-label{font-size:11px;color:var(--text-3);margin-top:2px;text-transform:uppercase;letter-spacing:0.08em;}
+
+  .stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:22px;}
+  .stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+  .stat-num{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:600;}
+  .stat-label{font-size:10px;color:var(--text-3);margin-top:2px;text-transform:uppercase;letter-spacing:0.05em;font-family:'IBM Plex Mono',monospace;}
+
+  .duty-section{margin-bottom:24px;}
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:var(--text-3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .duty-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .duty-group{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+  .duty-group-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .duty-group-title{font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px;}
+  .duty-group-count{font-size:11px;color:var(--text-3);font-family:'IBM Plex Mono',monospace;}
+  .duty-names{font-size:12px;color:var(--text-2);line-height:1.9;max-height:150px;overflow-y:auto;}
+  .duty-names div{border-bottom:1px dashed var(--border);padding:2px 0;}
+  .duty-names div:last-child{border-bottom:none;}
+  .duty-empty{font-size:12px;color:var(--text-3);font-style:italic;}
+
+  .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px;justify-content:space-between;}
+  .controls-left{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  input[type=text],input[type=date]{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+  input[type=text]{width:200px;}
+  select{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+  input::placeholder{color:var(--text-3);}
+  .week-nav{display:flex;align-items:center;gap:10px;}
+  .week-nav button{background:var(--panel-2);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:14px;}
+  .week-nav button:hover{border-color:var(--border-strong);}
+  .week-nav .today-btn{width:auto;padding:0 12px;font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  .week-label{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--text-2);min-width:170px;text-align:center;}
+
+  .legend{display:flex;gap:12px;font-size:11px;color:var(--text-2);align-items:center;flex-wrap:wrap;margin-bottom:14px;font-family:'IBM Plex Mono',monospace;}
+  .legend-item{display:flex;align-items:center;gap:5px;}
+  .legend-swatch{width:9px;height:9px;border-radius:3px;}
+
+  .grid-wrap{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;min-width:920px;}
+  thead th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.05em;color:var(--text-3);text-transform:uppercase;padding:12px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel);z-index:1;}
+  thead th.day-col{text-align:center;}
+  thead th .day-date{display:block;font-size:9.5px;color:var(--text-3);margin-top:2px;font-weight:400;text-transform:none;}
+  thead th.today-col{color:var(--text);}
+  tbody td{padding:8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:rgba(255,255,255,0.015);}
+  .op-cell{display:flex;align-items:center;gap:9px;min-width:190px;}
+  .op-avatar{width:30px;height:30px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:11px;color:var(--text-2);border:1px solid var(--border);}
+  .op-name{font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:7px;}
+  .op-id{font-size:10px;font-weight:500;color:var(--text-3);background:var(--panel-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;}
+  .op-meta{font-size:10.5px;color:var(--text-3);}
+  .shift-cell{text-align:center;}
+  .shift-pill{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:6px 4px;border-radius:7px;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;}
+  .s01{background:var(--s01-bg);color:var(--s01-text);}
+  .s02{background:var(--s02-bg);color:var(--s02-text);}
+  .s03{background:var(--s03-bg);color:var(--s03-text);}
+  .s04{background:var(--s04-bg);color:var(--s04-text);}
+  .off{background:var(--off-bg);color:var(--off-text);}
+  .cuti{background:var(--cuti-bg);color:var(--cuti-text);}
+  .ro{background:var(--ro-bg);color:var(--ro-text);}
+  .na{background:var(--na-bg);color:var(--na-text);}
+
+  .result-count{font-size:12px;color:var(--text-3);margin-bottom:10px;font-family:'IBM Plex Mono',monospace;}
+  footer{margin-top:24px;font-size:11px;color:var(--text-3);text-align:center;font-family:'IBM Plex Mono',monospace;}
+
+  @media(max-width:720px){
+    body{padding:20px 16px 48px;}
+    .stats-row{grid-template-columns:repeat(2,1fr);}
+    .controls{flex-direction:column;align-items:stretch;}
+  }
+  /* =========================================================
+   DESAIN RESPONSIF KHUSUS LAYAR HP / SMARTPHONE (MAX 768PX)
+   ========================================================= */
+@media screen and (max-width: 768px) {
+  
+  /* 1. Atur padding halaman utama agar tidak terlalu tebal di HP */
+  body {
+    padding: 12px 10px 30px !important;
+  }
+
+  /* 2. Header & Judul Dashboard */
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  /* 3. Ringkasan Angka (Total Operator, Shift S01, dll) */
+  /* Ubah menjadi grid 2 kolom agar muat dan rapi di HP */
+  .metrics-grid, 
+  div[style*="grid-template-columns"] { 
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* 4. Box List Operator Per Shift (S01, S02, S03, Off, Cuti, dll) */
+  /* Ubah tampilan menyamping menjadi menumpuk ke bawah */
+  div[style*="display: flex"][style*="gap"],
+  .shift-container {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .shift-card, 
+  div[style*="flex: 1"] {
+    width: 100% !important;
+    max-height: 200px !important; /* Agar tidak terlalu panjang ke bawah */
+    overflow-y: auto !important;
+  }
+
+  /* 5. Area Filter & Search */
+  /* Buat semua input filter menjadi 1 kolom penuh */
+  .filter-bar,
+  div[style*="display: flex"][style*="align-items: center"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  input, select {
+    width: 100% !important;
+  }
+
+  /* 6. Tabel Matriks Utama (Jadwal Operator) */
+  /* Agar tabel bisa di-scroll ke kanan-kiri tanpa merusak layar */
+  .table-responsive,
+  div:has(> table) {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 750px !important; /* Memastikan lebar kolom tabel tetap terbaca */
+  }
+
+  /* Kunci Kolom 'OPERATOR' (Nama) agar tetap menempel di kiri saat di-scroll */
+  table th:first-child,
+  table td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    background-color: var(--panel, #161D27) !important; /* Warna sesuai variabel CSS kamu */
+    z-index: 10 !important;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand-eyebrow">Panel Operasional · Arjawinangun DC</div>
+    <h1 class="brand-title">Jadwal Operator 2026</h1>
+    <div class="brand-sub" id="empCount">-</div>
+  </div>
+  <div class="today-block">
+    <div class="today-date mono" id="selectedDateLabel">-</div>
+    <div class="today-label">Tanggal terpilih</div>
+  </div>
+</header>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="duty-section">
+  <div class="section-label">Ringkasan shift · tanggal terpilih</div>
+  <div class="duty-groups" id="dutyGroups"></div>
+</div>
+
+<div class="controls">
+  <div class="controls-left">
+    <input type="text" id="searchInput" placeholder="Cari nama atau OPSID...">
+    <select id="teamFilter"><option value="">Semua tim</option></select>
+    <select id="posFilter"><option value="">Semua posisi</option></select>
+    <input type="date" id="dateJump" min="2026-01-01" max="2026-12-31">
+  </div>
+  <div class="week-nav">
+    <button id="prevWeek" aria-label="Minggu sebelumnya">‹</button>
+    <button class="today-btn" id="todayBtn">Hari ini</button>
+    <span class="week-label mono" id="weekLabel">-</span>
+    <button id="nextWeek" aria-label="Minggu berikutnya">›</button>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--s01)"></div>S01</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--s02)"></div>S02</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--s03)"></div>S03</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--s04)"></div>S04</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--off)"></div>OFF</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--cuti)"></div>Cuti</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--ro)"></div>RO</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--na)"></div>Tidak ada data</div>
+  <div style="color:var(--text-3);">— jam kerja per kode shift tidak tercantum di sumber data</div>
+</div>
+
+<div class="result-count" id="resultCount"></div>
+
+<div class="grid-wrap">
+  <table>
+    <thead><tr id="headRow"></tr></thead>
+    <tbody id="bodyRows"></tbody>
+  </table>
+</div>
+
+<footer>Sumber: Jadwal_Man_Power_2026_Arjawinangun_DC (tab Jadwal) · 115 operator aktif · rentang 1 Jan – 31 Des 2026</footer>
+
+<script>
+const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+let DATA = null;
+let dateIndex = {};
+let teams = [];
+let positions = [];
+let teamFilter, posFilter;
+let firstDate, lastDate, today, selectedDate;
+
+const CODE_CLASS = { S01:'s01', S02:'s02', S03:'s03', S04:'s04', OFF:'off', CUTI:'cuti', RO:'ro', '-':'na' };
+const SHIFT_CODES = ['S01','S02','S03','S04'];
+
+function isoOf(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+
+function initials(name){ return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+
+function getMonday(d){
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  const m = new Date(d); m.setDate(d.getDate()+diff);
+  return m;
+}
+
+function fmtShort(d){ return d.toLocaleDateString('id-ID', { day:'2-digit', month:'short' }); }
+function fmtFull(d){ return d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
+
+function renderTop(){
+  document.getElementById('selectedDateLabel').textContent = fmtFull(selectedDate);
+  document.getElementById('dateJump').value = isoOf(selectedDate);
+}
+
+function renderStats(){
+  const idx = dateIndex[isoOf(selectedDate)];
+  const counts = { S01:0, S02:0, S03:0, S04:0, OFF:0, CUTI:0, RO:0 };
+  DATA.employees.forEach(e => { const c = e.shifts[idx]; if (counts[c] !== undefined) counts[c]++; });
+  const cards = [
+    { label:'Total operator', num: DATA.employees.length },
+    { label:'Shift S01', num: counts.S01 },
+    { label:'Shift S02', num: counts.S02 },
+    { label:'Shift S03', num: counts.S03 },
+    { label:'Shift S04', num: counts.S04 },
+    { label:'Off / cuti', num: counts.OFF + counts.CUTI + counts.RO }
+  ];
+  document.getElementById('statsRow').innerHTML = cards.map(c =>
+    '<div class="stat-card"><div class="stat-num">'+c.num+'</div><div class="stat-label">'+c.label+'</div></div>'
+  ).join('');
+}
+
+function renderDutyGroups(){
+  const idx = dateIndex[isoOf(selectedDate)];
+  const groups = { S01:[], S02:[], S03:[], S04:[], OFF:[], CUTI:[], RO:[] };
+  DATA.employees.forEach(e => { const c = e.shifts[idx]; if (groups[c]) groups[c].push(e.name); });
+  const labels = { S01:'Shift S01', S02:'Shift S02', S03:'Shift S03', S04:'Shift S04', OFF:'Off', CUTI:'Cuti', RO:'RO' };
+  const order = ['S01','S02','S03','S04','OFF','CUTI','RO'];
+  document.getElementById('dutyGroups').innerHTML = order.map(k => {
+    const cls = CODE_CLASS[k];
+    const names = groups[k];
+    return '<div class="duty-group">'+
+      '<div class="duty-group-head"><span class="duty-group-title '+cls+'">'+labels[k]+'</span>'+
+      '<span class="duty-group-count">'+names.length+' orang</span></div>'+
+      '<div class="duty-names">'+(names.length ? names.map(n=>'<div>'+n+'</div>').join('') : '<div class="duty-empty">Tidak ada</div>')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function renderHeader(){
+  const monday = getMonday(selectedDate);
+  const headRow = document.getElementById('headRow');
+  headRow.innerHTML = '<th style="min-width:190px;">Operator</th>';
+  const days = ['Sen','Sel','Rab','Kam',"Jum",'Sab','Min'];
+  for (let i=0;i<7;i++){
+    const date = new Date(monday); date.setDate(monday.getDate()+i);
+    const th = document.createElement('th');
+    th.className = 'day-col' + (isoOf(date)===isoOf(selectedDate) ? ' today-col' : '');
+    th.innerHTML = days[i] + '<span class="day-date">'+fmtShort(date)+'</span>';
+    headRow.appendChild(th);
+  }
+  const sun = new Date(monday); sun.setDate(monday.getDate()+6);
+  document.getElementById('weekLabel').textContent = fmtShort(monday)+' – '+fmtShort(sun);
+}
+
+function renderGrid(){
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  const teamVal = teamFilter.value;
+  const posVal = posFilter.value;
+  const monday = getMonday(selectedDate);
+  const dayIdxs = [];
+  for (let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); dayIdxs.push(dateIndex[isoOf(d)]); }
+
+  const filtered = DATA.employees.filter(e => {
+    if (search && !e.name.toLowerCase().includes(search) && !e.opsid.toLowerCase().includes(search)) return false;
+    if (teamVal && e.team !== teamVal) return false;
+    if (posVal && e.position !== posVal) return false;
+    return true;
+  });
+
+  document.getElementById('resultCount').textContent = filtered.length + ' dari ' + DATA.employees.length + ' operator ditampilkan';
+
+  const bodyRows = document.getElementById('bodyRows');
+  if (filtered.length === 0){
+    bodyRows.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:32px;">Tidak ada operator yang cocok dengan filter.</td></tr>';
+    return;
+  }
+
+  bodyRows.innerHTML = filtered.map(e => {
+    const cells = dayIdxs.map(di => {
+      if (di === undefined) return '<td class="shift-cell"><span class="shift-pill na">-</span></td>';
+      const code = e.shifts[di];
+      const cls = CODE_CLASS[code] || 'na';
+      return '<td class="shift-cell"><span class="shift-pill '+cls+'">'+code+'</span></td>';
+    }).join('');
+    return '<tr><td><div class="op-cell"><div class="op-avatar">'+initials(e.name)+'</div>'+
+      '<div><div class="op-name"><span class="op-id mono">'+e.opsid+'</span>'+e.name+'</div><div class="op-meta">'+e.position+' · Tim '+e.team+'</div></div></div></td>'+
+      cells+'</tr>';
+  }).join('');
+}
+
+function renderAll(){
+  renderTop();
+  renderStats();
+  renderDutyGroups();
+  renderHeader();
+  renderGrid();
+}
+
+function initApp(){
+  dateIndex = {};
+  DATA.dates.forEach((d,i) => dateIndex[d] = i);
+
+  teams = [...new Set(DATA.employees.map(e => e.team))].sort();
+  positions = [...new Set(DATA.employees.map(e => e.position))].sort();
+
+  teamFilter = document.getElementById('teamFilter');
+  teamFilter.innerHTML = '<option value="">Semua tim</option>';
+  teams.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; teamFilter.appendChild(o); });
+  posFilter = document.getElementById('posFilter');
+  posFilter.innerHTML = '<option value="">Semua posisi</option>';
+  positions.forEach(p => { const o=document.createElement('option'); o.value=p; o.textContent=p; posFilter.appendChild(o); });
+
+  document.getElementById('empCount').textContent = DATA.employees.length + ' operator aktif';
+
+  firstDate = new Date(DATA.dates[0]+'T00:00:00');
+  lastDate = new Date(DATA.dates[DATA.dates.length-1]+'T00:00:00');
+  today = new Date(); today.setHours(0,0,0,0);
+  if (today < firstDate || today > lastDate) today = new Date(firstDate);
+  selectedDate = new Date(today);
+
+  document.getElementById('searchInput').addEventListener('input', renderGrid);
+  teamFilter.addEventListener('change', renderGrid);
+  posFilter.addEventListener('change', renderGrid);
+  document.getElementById('prevWeek').addEventListener('click', () => { selectedDate.setDate(selectedDate.getDate()-7); renderAll(); });
+  document.getElementById('nextWeek').addEventListener('click', () => { selectedDate.setDate(selectedDate.getDate()+7); renderAll(); });
+  document.getElementById('todayBtn').addEventListener('click', () => { selectedDate = new Date(today); renderAll(); });
+  document.getElementById('dateJump').addEventListener('change', (e) => {
+    if (e.target.value){ selectedDate = new Date(e.target.value+'T00:00:00'); renderAll(); }
+  });
+
+  renderAll();
+}
+
+async function loadData(){
+  document.getElementById('empCount').textContent = 'Memuat data jadwal...';
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    DATA = await res.json();
+    if (!DATA || !DATA.dates || !DATA.employees) throw new Error('Format data tidak sesuai');
+    initApp();
+  } catch (err) {
+    console.error('Gagal memuat data jadwal:', err);
+    document.getElementById('empCount').textContent = 'Gagal memuat data';
+    document.getElementById('bodyRows').innerHTML =
+      '<tr><td colspan="8" style="text-align:center;color:var(--cuti-text);padding:32px;">Gagal memuat data jadwal dari Google Sheet.<br>Cek APPS_SCRIPT_URL di kode atau koneksi internet.</td></tr>';
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
