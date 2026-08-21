@@ -102,6 +102,83 @@
     .stats-row{grid-template-columns:repeat(2,1fr);}
     .controls{flex-direction:column;align-items:stretch;}
   }
+  /* =========================================================
+   DESAIN RESPONSIF KHUSUS LAYAR HP / SMARTPHONE (MAX 768PX)
+   ========================================================= */
+@media screen and (max-width: 768px) {
+  
+  /* 1. Atur padding halaman utama agar tidak terlalu tebal di HP */
+  body {
+    padding: 12px 10px 30px !important;
+  }
+
+  /* 2. Header & Judul Dashboard */
+  header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  /* 3. Ringkasan Angka (Total Operator, Shift S01, dll) */
+  /* Ubah menjadi grid 2 kolom agar muat dan rapi di HP */
+  .metrics-grid, 
+  div[style*="grid-template-columns"] { 
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* 4. Box List Operator Per Shift (S01, S02, S03, Off, Cuti, dll) */
+  /* Ubah tampilan menyamping menjadi menumpuk ke bawah */
+  div[style*="display: flex"][style*="gap"],
+  .shift-container {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .shift-card, 
+  div[style*="flex: 1"] {
+    width: 100% !important;
+    max-height: 200px !important; /* Agar tidak terlalu panjang ke bawah */
+    overflow-y: auto !important;
+  }
+
+  /* 5. Area Filter & Search */
+  /* Buat semua input filter menjadi 1 kolom penuh */
+  .filter-bar,
+  div[style*="display: flex"][style*="align-items: center"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  input, select {
+    width: 100% !important;
+  }
+
+  /* 6. Tabel Matriks Utama (Jadwal Operator) */
+  /* Agar tabel bisa di-scroll ke kanan-kiri tanpa merusak layar */
+  .table-responsive,
+  div:has(> table) {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 750px !important; /* Memastikan lebar kolom tabel tetap terbaca */
+  }
+
+  /* Kunci Kolom 'OPERATOR' (Nama) agar tetap menempel di kiri saat di-scroll */
+  table th:first-child,
+  table td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    background-color: var(--panel, #161D27) !important; /* Warna sesuai variabel CSS kamu */
+    z-index: 10 !important;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  }
+}
 </style>
 </head>
 <body>
